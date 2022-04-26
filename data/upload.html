@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+  <title>上传</title>
+</head>
+
+<body>
+	<center>
+    <div id="all">
+      <h1>ESP32 SPIFFS 文件上传</h1>
+      <p>点击按钮选择需要上传的文件</p>
+      <form method="post" enctype="multipart/form-data">
+        <div class="upload-pics-item small">
+          <span class="iconfont upload-icon icon-xiangji f-20"></span>
+          <input type="file" name="pic1" value="" class="upload-pic-input">
+          <p class="f-12">添加图片</p>
+          <img src="" alt="">
+        </div>
+        <input class="button" type="submit" value="上传">
+      </form>
+    </div>
+	</center>
+  <style>
+    #all{
+      display: flex;
+    width: 80%;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    height: 100%;
+    background-color: rgba(255,255,255,60%);
+    border-radius: 1.5rem;
+    margin: 7% auto;
+    box-shadow: 0 0 1rem 0.2rem rgb(0 0 0 / 10%);
+    }
+    .upload-pic-input {
+    position: relative;
+    display: inline-block;
+    background: #D0EEFF;
+    border: 1px solid #99D3F5;
+    border-radius: 4px;
+    padding: 4px 12px;
+    overflow: hidden;
+    color: #1E88C7;
+    text-decoration: none;
+    text-indent: 0;
+    line-height: 20px;
+    flex: auto;
+    }
+    .upload-pic-input input {
+        position: absolute;
+        font-size: 100px;
+        right: 0;
+        top: 0;
+        opacity: 0;
+    }
+    .upload-pic-input:hover {
+        background: #AADFFD;
+        border-color: #78C3F3;
+        color: #004974;
+        text-decoration: none;
+    }
+  </style>
+  <script>
+    let dom = document.getElementsByClassName('upload-pic-input');
+    Array.from(dom).forEach(item=>{
+      item.onchange = function(){
+        $(this).parent().find('p').hide();
+        $(this).parent().find('.iconfont').hide();
+        let src = getObjectURL(this.files[0]);
+        if(src){
+          $(this).parent().find('img').attr('src',src);
+        }else{
+          $(this).parent().find('img').attr('alt',this.files[0]);
+        }
+      }
+    })
+
+    // 判断浏览器是否支持 createObjectURL api
+    function getObjectURL(file) {
+            var url = null;
+            if (window.createObjectURL!=undefined) {
+              url = window.createObjectURL(file) ;
+            } else if (window.URL!=undefined) { // mozilla(firefox)
+              url = window.URL.createObjectURL(file) ;
+            } else if (window.webkitURL!=undefined) { // webkit or chrome
+              url = window.webkitURL.createObjectURL(file) ;
+            }
+            return url ;
+    }
+  </script>
+</body>
+
+</html>

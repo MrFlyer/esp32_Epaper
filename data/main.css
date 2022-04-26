@@ -1,0 +1,15 @@
+body {
+    font-family: sans-serif;
+    color: #444;
+}
+p{
+    background-color: bisque;
+    width: 220px;
+}
+#fileget{
+    background-color: aqua;
+}
+.button{
+    background-color: blue;
+    width: 50px;
+}
