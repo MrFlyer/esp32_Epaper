@@ -383,5 +383,4 @@ void loop()
   // server.handleClient();
   // timeClient.update();
   printLocalTime();
-
 }
