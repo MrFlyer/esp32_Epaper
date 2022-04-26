@@ -10,11 +10,11 @@
 #include <string.h>
 #include <SPIFFS.h> //闪存相关
 #include <FS.h>
-#include <GxEPD2_BW.h>  // 黑白二色库
-#include <GxEPD2_3C.h>  // 红黑白三色库
+#include <GxEPD2_BW.h> // 黑白二色库
+#include <GxEPD2_3C.h> // 红黑白三色库
 #include <Adafruit_I2CDevice.h>
 #include <U8g2_for_Adafruit_GFX.h> //字体库
-#include <EEPROM.h> //存储当前页数
+#include <EEPROM.h>                //存储当前页数
 #include <NTPClient.h>
 #include <WiFi.h>
 #include <WebUpload.h> //web上传
@@ -30,7 +30,7 @@ U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
 
 WiFiUDP ntpUDP; // 创建一个WIFI UDP连接
 
-NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60*60*8, 30*60*1000);
+NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 8, 30 * 60 * 1000);
 
 using namespace std;
 
@@ -39,8 +39,6 @@ int i = 0;
 vector<String> v;
 
 String data;
-
-
 
 //启动wifi打印链接ip
 void WiFi_Booting()
@@ -86,7 +84,8 @@ void WiFi_Booting()
 }
 
 //获取书目列表并且存入动态大小数组V中
-void GetBookList(){
+void GetBookList()
+{
   if (!SPIFFS.begin())
   {
     Serial.println("An Error has occurred while mounting LittleFS");
@@ -102,7 +101,8 @@ void GetBookList(){
 }
 
 //当从web上传文件之后更新本地动态大小数组V
-void UpdateBook(){
+void UpdateBook()
+{
   v.clear();
 
   File dataFile = SPIFFS.open("/book.txt", "r");
@@ -119,7 +119,8 @@ void PrintWord(int num)
 {
   String line = "";
   String word = "";
-  if (num % 5 != 0){ //傻逼屏幕不给面子局刷一次就糊、
+  if (num % 5 != 0)
+  { //傻逼屏幕不给面子局刷一次就糊、
     display.setPartialWindow(0, 0, display.width(), display.height());
   }
   line = v[num];
@@ -209,7 +210,9 @@ void Button()
         Serial.print(i);
         PrintWord(v.size());
         i = v.size();
-      }else{
+      }
+      else
+      {
         display.setFullWindow();
         display.firstPage();
         do
@@ -220,9 +223,10 @@ void Button()
         Serial.print("i++完成");
         PrintWord(i);
         Serial.print(i);
-        EEPROM.write(10,i);delay(1);
+        EEPROM.write(10, i);
+        delay(1);
         Serial.print("\n");
-        Serial.print(EEPROM.read(10),DEC);
+        Serial.print(EEPROM.read(10), DEC);
         EEPROM.commit();
       }
     }
@@ -246,7 +250,9 @@ void Button()
         Serial.print(i);
         PrintWord(0);
         i = 0;
-      }else{
+      }
+      else
+      {
         display.setFullWindow();
         display.firstPage();
         do
@@ -256,9 +262,10 @@ void Button()
         i--;
         PrintWord(i);
         Serial.print(i);
-        EEPROM.write(10,i);delay(1);
+        EEPROM.write(10, i);
+        delay(1);
         Serial.print("\n");
-        Serial.print(EEPROM.read(10),DEC);
+        Serial.print(EEPROM.read(10), DEC);
         EEPROM.commit();
       }
     }
@@ -280,56 +287,67 @@ void Button()
       delay(3000);
       PrintWord(0);
       i = 0;
-      EEPROM.write(10,i);delay(1);
+      EEPROM.write(10, i);
+      delay(1);
       EEPROM.commit();
     }
   }
 }
 
-// //文章溢出检测  (这货现在有BUG用不了)
-// void OutFile()
-// {
-//   if (i == sizeof(v))
-//   {
-//     do
-//     {
-//       display.setFullWindow();
-//       display.firstPage();
-//       display.setCursor(17, 40);
-//       display.println("HAD READ ALL BOOK");
-//     } while (display.nextPage());
-//     Serial.print(i);
-//   }
-//   if (i < 0)
-//   {
-//     do
-//     {
-//       display.setFullWindow();
-//       display.firstPage();
-//       display.setCursor(10, 40);
-//       display.println("Already the beginning");
-//     } while (display.nextPage());
-//     delay(2000);
-//     Serial.print(i);
-//     GetWord(0);
-//     i = 0;
-//   }
-// }
+void GetTime()
+{
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo))
+  {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  // Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  data = timeinfo.tm_hour;
+  data += ":";
+  data += timeinfo.tm_min;
+  display.firstPage();
+  display.setPartialWindow(0, 0, display.width(), display.height());
+  u8g2Fonts.setFont(u8g2_font_inb53_mr);
+  u8g2Fonts.setCursor(13, 90);
+  // display.setCursor(30,34);
+  // display.setTextSize(8);
+  do
+  {
+    u8g2Fonts.println(data.c_str());
+  } while (display.nextPage());
+  Serial.println(data.c_str());
+}
 
 
-// void printLocalTime()
-// {
-//   struct tm timeinfo;
-//   if(!getLocalTime(&timeinfo)){
-//     Serial.println("Failed to obtain time");
-//     return;
-//   }
-//   // Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-//   char hour = timeinfo.tm_hour;
-//   char min = timeinfo.tm_min;
-//   Serial.println(hour);
-//   Serial.println(min);
-// }
+//使用arduino自带库进行同步NTP服务器与本地的RTC时钟
+void printLocalTime()
+{
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo))
+  {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  // Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  data = timeinfo.tm_hour;
+  data += ":";
+  data += timeinfo.tm_min;
+  if (timeinfo.tm_sec == 59)
+  {
+    display.firstPage();
+    display.setPartialWindow(0, 0, display.width(), display.height());
+    u8g2Fonts.setFont(u8g2_font_inb53_mr);
+    u8g2Fonts.setCursor(13, 90);
+    // display.setCursor(30,34);
+    // display.setTextSize(8);
+    do
+    {
+      u8g2Fonts.println(data.c_str());
+    } while (display.nextPage());
+    Serial.println(data.c_str());
+  }
+}
 
 //程序总启动
 void setup()
@@ -352,33 +370,18 @@ void setup()
   // PrintWord(i);
   // CorrectAdc();
   // web_setup();
-  timeClient.begin();
-  // configTime(8 * 3600, 0, NTP1, NTP2, NTP3);
-  // printLocalTime();
+  // timeClient.begin();
+  configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
+  GetTime();
 }
 
 //程序总循环
 void loop()
 {
   // Button();
-  //GetVoltage();
+  // GetVoltage();
   // server.handleClient();
-  timeClient.update();
-  // printLocalTime();
-  display.firstPage();
-  display.setPartialWindow(0,0,display.width(),display.height());
-  data = timeClient.getHours();
-  data += ":";
-  data += timeClient.getMinutes();
-  u8g2Fonts.setFont(u8g2_font_inb53_mr);
-  u8g2Fonts.setCursor(13, 90);
-  // display.setCursor(30,34);
-  // display.setTextSize(8);
-  do
-  {
-    u8g2Fonts.println(data.c_str());
-  } while (display.nextPage());
+  // timeClient.update();
+  printLocalTime();
 
-  // Serial.println(data.c_str());
-  delay(59000);
 }
