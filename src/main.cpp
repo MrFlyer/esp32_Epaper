@@ -6,6 +6,7 @@
                 5.支持存储目前页数保存当前进度
                 6.支持WEB上传文件（还没测试
 */
+
 #include <Arduino.h>
 #include <string.h>
 #include <SPIFFS.h> //闪存相关
@@ -294,6 +295,7 @@ void Button()
   }
 }
 
+//显示时间
 void GetTime()
 {
   struct tm timeinfo;
@@ -319,7 +321,6 @@ void GetTime()
   Serial.println(data.c_str());
 }
 
-
 //使用arduino自带库进行同步NTP服务器与本地的RTC时钟
 void printLocalTime()
 {
@@ -333,7 +334,7 @@ void printLocalTime()
   data = timeinfo.tm_hour;
   data += ":";
   data += timeinfo.tm_min;
-  if (timeinfo.tm_sec == 59)
+  if (timeinfo.tm_sec == 0) //当时间到达0秒的时候局刷分
   {
     display.firstPage();
     display.setPartialWindow(0, 0, display.width(), display.height());
@@ -346,6 +347,19 @@ void printLocalTime()
       u8g2Fonts.println(data.c_str());
     } while (display.nextPage());
     Serial.println(data.c_str());
+  }
+  if (timeinfo.tm_min % 10 == 0) //当分钟达到整时时候，做一次全刷
+  {
+    display.setFullWindow();
+    display.firstPage();
+    u8g2Fonts.setFont(u8g2_font_inb53_mr);
+    u8g2Fonts.setCursor(13, 90);
+    // display.setCursor(30,34);
+    // display.setTextSize(8);
+    do
+    {
+      u8g2Fonts.println(data.c_str());
+    } while (display.nextPage());
   }
 }
 
