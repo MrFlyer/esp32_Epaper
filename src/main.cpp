@@ -30,9 +30,9 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(/*CS=D8
 //定义字体
 U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
 
-WiFiUDP ntpUDP; // 创建一个WIFI UDP连接
+// WiFiUDP ntpUDP; // 创建一个WIFI UDP连接
 
-NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 8, 30 * 60 * 1000);
+// NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 8, 30 * 60 * 1000);
 
 using namespace std;
 
