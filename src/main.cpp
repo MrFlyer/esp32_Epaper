@@ -381,21 +381,21 @@ void setup()
   pinMode(27, OUTPUT);
   digitalWrite(27, HIGH);
   i = EEPROM.read(10);
-  // GetBookList();
-  // PrintWord(i);
+  GetBookList();
+  PrintWord(i);
   // CorrectAdc();
-  // web_setup();
+  web_setup();
   // timeClient.begin();
   configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
-  GetTime();
+  // GetTime();
 }
 
 //程序总循环
 void loop()
 {
-  // Button();
+  Button();
   // GetVoltage();
-  // server.handleClient();
+  server.handleClient();
   // timeClient.update();
-  printLocalTime();
+  // printLocalTime();
 }

@@ -11,7 +11,7 @@ Ticker ticker;
 
 WebServer server(80);
 
-const char *ssid = "ASUS_33_5G";     // WiFi名子
+const char *ssid = "NEWIFI3_3BE7";     // WiFi名子
 const char *password = "3214569987"; // WiFi密码
 
 const char* file_name = "/book.txt";
