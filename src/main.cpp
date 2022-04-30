@@ -31,7 +31,7 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(/*CS=D8
 //定义字体
 U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
 
-Button2 PageChoose;
+Button2 MethodChoose, NextWord, LastWord;
 
 // WiFiUDP ntpUDP; // 创建一个WIFI UDP连接
 
@@ -46,6 +46,8 @@ int flag = 1;
 vector<String> v;
 
 String data;
+
+int temp = 0;
 
 //启动wifi打印链接ip
 void WiFi_Booting()
@@ -107,28 +109,14 @@ void GetBookList()
   dataFile.close();
 }
 
-//当从web上传文件之后更新本地动态大小数组V
-void UpdateBook()
-{
-  v.clear();
-
-  File dataFile = SPIFFS.open("/book.txt", "r");
-
-  while (dataFile.available())
-  {
-    v.push_back(dataFile.readStringUntil('\n'));
-  }
-  dataFile.close();
-}
-
 //从文件获取每行单词并将其打印
 void PrintWord(int num)
 {
   String line = "";
   String word = "";
-  if (num % 15 == 0)
-  { //傻逼屏幕不给面子局刷一次就糊、
-    display.setFullWindow();
+  if (num % 10 != 0)
+  {
+    display.setPartialWindow(0, 0, display.width(), display.height());
   }
   line = v[num];
   Serial.println(line);
@@ -195,6 +183,34 @@ void PrintWord(int num)
   display.nextPage();
 }
 
+//当从web上传文件之后更新本地动态大小数组V
+void UpdateBook(Button2 &btn)
+{
+  display.setFullWindow();
+  display.firstPage();
+  do
+  {
+    display.fillScreen(GxEPD_WHITE);
+    display.setCursor(10, 40);
+    display.println("UPLOADING NEW BOOK");
+  } while (display.nextPage());
+  v.clear();
+  File dataFile = SPIFFS.open("/book.txt", "r");
+
+  while (dataFile.available())
+  {
+    v.push_back(dataFile.readStringUntil('\n'));
+  }
+  dataFile.close();
+  delay(2000);
+  display.fillScreen(GxEPD_WHITE);
+  i = 0;
+  PrintWord(i);
+  flag = 2;
+  EEPROM.write(10, i);
+  delay(1);
+  EEPROM.commit();
+}
 
 //使用arduino自带库进行同步NTP服务器与本地的RTC时钟
 void printLocalTime()
@@ -209,8 +225,9 @@ void printLocalTime()
   data = timeinfo.tm_hour;
   data += ":";
   data += timeinfo.tm_min;
-  if (timeinfo.tm_sec == 0) //当时间到达0秒的时候局刷分
+  if (timeinfo.tm_sec == 0 && temp == 0) //当时间到达0秒的时候局刷分
   {
+    temp = 1;
     display.firstPage();
     display.setPartialWindow(0, 0, display.width(), display.height());
     u8g2Fonts.setFont(u8g2_font_inb53_mr);
@@ -222,6 +239,10 @@ void printLocalTime()
       u8g2Fonts.println(data.c_str());
     } while (display.nextPage());
     Serial.println(data.c_str());
+  }
+  else if (timeinfo.tm_sec != 0)
+  {
+    temp = 0;
   }
   if (timeinfo.tm_min % 10 == 0) //当分钟达到整时时候，做一次全刷
   {
@@ -328,28 +349,6 @@ void Button(int page)
         }
       }
     }
-    if (digitalRead(27) == LOW) //更新书目
-    {
-      delay(200);
-      if (digitalRead(27) == LOW)
-      {
-        display.setFullWindow();
-        display.firstPage();
-        do
-        {
-          display.fillScreen(GxEPD_WHITE);
-          display.setCursor(10, 40);
-          display.println("UPLOADING NEW BOOK");
-        } while (display.nextPage());
-        UpdateBook();
-        delay(3000);
-        PrintWord(0);
-        i = 0;
-        EEPROM.write(10, i);
-        delay(1);
-        EEPROM.commit();
-      }
-    }
     break;
   }
 }
@@ -407,6 +406,16 @@ void handler(Button2 &btn)
   }
 }
 
+void Button_init()
+{
+  pinMode(25, OUTPUT);
+  digitalWrite(25, HIGH);
+  pinMode(26, OUTPUT);
+  digitalWrite(26, HIGH);
+  MethodChoose.begin(27, PULLUP);
+  MethodChoose.setPressedHandler(handler);
+  MethodChoose.setDoubleClickHandler(UpdateBook);
+}
 
 //程序总启动
 void setup()
@@ -418,14 +427,7 @@ void setup()
   u8g2Fonts.begin(display);                  //将u8g2连接到display
   u8g2Fonts.setForegroundColor(GxEPD_BLACK); // 设置前景色
   u8g2Fonts.setBackgroundColor(GxEPD_WHITE);
-  pinMode(25, OUTPUT);
-  digitalWrite(25, HIGH);
-  pinMode(26, OUTPUT);
-  digitalWrite(26, HIGH);
-  pinMode(27, OUTPUT);
-  digitalWrite(27, HIGH);
-  PageChoose.begin(21,PULLUP);
-  PageChoose.setPressedHandler(handler);
+  Button_init();
   i = EEPROM.read(10);
   GetBookList();
   // PrintWord(i);
@@ -443,7 +445,7 @@ void setup()
 //程序总循环
 void loop()
 {
-  PageChoose.loop();
+  MethodChoose.loop();
   Button(flag);
   // GetVoltage();
   // server.handleClient();
