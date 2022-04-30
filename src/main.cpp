@@ -18,6 +18,7 @@
 #include <U8g2_for_Adafruit_GFX.h> //字体库
 #include <EEPROM.h>                //存储当前页数
 #include <NTPClient.h>
+#include <Button2.h> //单击双击按键库
 #include <WiFi.h>
 #include <WebUpload.h> //web上传
 #include <GetBatVal.h> //获取当前电量
@@ -30,6 +31,8 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(/*CS=D8
 //定义字体
 U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
 
+Button2 PageChoose;
+
 // WiFiUDP ntpUDP; // 创建一个WIFI UDP连接
 
 // NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 8, 30 * 60 * 1000);
@@ -37,6 +40,8 @@ U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
 using namespace std;
 
 int i = 0;
+
+int flag = 1;
 
 vector<String> v;
 
@@ -121,12 +126,13 @@ void PrintWord(int num)
 {
   String line = "";
   String word = "";
-  if (num % 5 != 0)
+  if (num % 15 == 0)
   { //傻逼屏幕不给面子局刷一次就糊、
-    display.setPartialWindow(0, 0, display.width(), display.height());
+    display.setFullWindow();
   }
   line = v[num];
   Serial.println(line);
+  display.fillScreen(GxEPD_WHITE);
   display.drawLine(5, 35, 245, 35, 0); //画水平线
   word = line.substring(0, line.indexOf("["));
   u8g2Fonts.setFont(u8g2_font_logisoso18_tr);
@@ -189,138 +195,6 @@ void PrintWord(int num)
   display.nextPage();
 }
 
-//按键事件检测连带文件溢出检测
-void Button()
-{
-  if (digitalRead(25) == LOW) //下一页
-  {
-    delay(200);
-    if (digitalRead(25) == LOW)
-    {
-      Serial.print("进入下一页判断");
-      if (i == v.size()) //文件顶溢出检测
-      {
-        do
-        {
-          display.setFullWindow();
-          display.firstPage();
-          display.setCursor(10, 40);
-          display.println("HAD READ ALL BOOK");
-        } while (display.nextPage());
-        delay(2000);
-        display.fillScreen(GxEPD_WHITE);
-        Serial.print(i);
-        PrintWord(v.size());
-        i = v.size();
-      }
-      else
-      {
-        display.setFullWindow();
-        display.firstPage();
-        do
-        {
-          display.fillScreen(GxEPD_WHITE);
-        } while (display.nextPage());
-        i++;
-        Serial.print("i++完成");
-        PrintWord(i);
-        Serial.print(i);
-        EEPROM.write(10, i);
-        delay(1);
-        Serial.print("\n");
-        Serial.print(EEPROM.read(10), DEC);
-        EEPROM.commit();
-      }
-    }
-  }
-  if (digitalRead(26) == LOW) //上一页
-  {
-    delay(200);
-    if (digitalRead(26) == LOW)
-    {
-      if (i == 0) //文件底溢出检测
-      {
-        do
-        {
-          display.setFullWindow();
-          display.firstPage();
-          display.setCursor(10, 40);
-          display.println("Already the beginning");
-        } while (display.nextPage());
-        delay(2000);
-        display.fillScreen(GxEPD_WHITE);
-        Serial.print(i);
-        PrintWord(0);
-        i = 0;
-      }
-      else
-      {
-        display.setFullWindow();
-        display.firstPage();
-        do
-        {
-          display.fillScreen(GxEPD_WHITE);
-        } while (display.nextPage());
-        i--;
-        PrintWord(i);
-        Serial.print(i);
-        EEPROM.write(10, i);
-        delay(1);
-        Serial.print("\n");
-        Serial.print(EEPROM.read(10), DEC);
-        EEPROM.commit();
-      }
-    }
-  }
-  if (digitalRead(27) == LOW) //更新书目
-  {
-    delay(200);
-    if (digitalRead(27) == LOW)
-    {
-      display.setFullWindow();
-      display.firstPage();
-      do
-      {
-        display.fillScreen(GxEPD_WHITE);
-        display.setCursor(10, 40);
-        display.println("UPLOADING NEW BOOK");
-      } while (display.nextPage());
-      UpdateBook();
-      delay(3000);
-      PrintWord(0);
-      i = 0;
-      EEPROM.write(10, i);
-      delay(1);
-      EEPROM.commit();
-    }
-  }
-}
-
-//显示时间
-void GetTime()
-{
-  struct tm timeinfo;
-  if (!getLocalTime(&timeinfo))
-  {
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  // Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-  data = timeinfo.tm_hour;
-  data += ":";
-  data += timeinfo.tm_min;
-  display.firstPage();
-  display.setPartialWindow(0, 0, display.width(), display.height());
-  u8g2Fonts.setFont(u8g2_font_inb53_mr);
-  u8g2Fonts.setCursor(13, 90);
-  // display.setCursor(30,34);
-  // display.setTextSize(8);
-  do
-  {
-    u8g2Fonts.println(data.c_str());
-  } while (display.nextPage());
-  Serial.println(data.c_str());
-}
 
 //使用arduino自带库进行同步NTP服务器与本地的RTC时钟
 void printLocalTime()
@@ -364,6 +238,176 @@ void printLocalTime()
   }
 }
 
+//按键事件检测连带文件溢出检测
+void Button(int page)
+{
+  switch (page)
+  {
+  case 1:
+    printLocalTime();
+    break;
+
+  case 2:
+    if (digitalRead(25) == LOW) //下一页
+    {
+      delay(200);
+      if (digitalRead(25) == LOW)
+      {
+        Serial.print("进入下一页判断");
+        if (i == v.size()) //文件顶溢出检测
+        {
+          do
+          {
+            display.setFullWindow();
+            display.firstPage();
+            display.setCursor(10, 40);
+            display.println("HAD READ ALL BOOK");
+          } while (display.nextPage());
+          delay(2000);
+          display.fillScreen(GxEPD_WHITE);
+          Serial.print(i);
+          PrintWord(v.size());
+          i = v.size();
+        }
+        else
+        {
+          // display.setFullWindow();
+          // display.firstPage();
+          // do
+          // {
+          //   display.fillScreen(GxEPD_WHITE);
+          // } while (display.nextPage());
+          i++;
+          Serial.print("i++完成");
+          PrintWord(i);
+          Serial.print(i);
+          EEPROM.write(10, i);
+          delay(1);
+          Serial.print("\n");
+          Serial.print(EEPROM.read(10), DEC);
+          EEPROM.commit();
+        }
+      }
+    }
+    if (digitalRead(26) == LOW) //上一页
+    {
+      delay(200);
+      if (digitalRead(26) == LOW)
+      {
+        if (i == 0) //文件底溢出检测
+        {
+          do
+          {
+            display.setFullWindow();
+            display.firstPage();
+            display.setCursor(10, 40);
+            display.println("Already the beginning");
+          } while (display.nextPage());
+          delay(2000);
+          display.fillScreen(GxEPD_WHITE);
+          Serial.print(i);
+          PrintWord(0);
+          i = 0;
+        }
+        else
+        {
+          // display.setFullWindow();
+          // display.firstPage();
+          // do
+          // {
+          //   display.fillScreen(GxEPD_WHITE);
+          // } while (display.nextPage());
+          i--;
+          PrintWord(i);
+          Serial.print(i);
+          EEPROM.write(10, i);
+          delay(1);
+          Serial.print("\n");
+          Serial.print(EEPROM.read(10), DEC);
+          EEPROM.commit();
+        }
+      }
+    }
+    if (digitalRead(27) == LOW) //更新书目
+    {
+      delay(200);
+      if (digitalRead(27) == LOW)
+      {
+        display.setFullWindow();
+        display.firstPage();
+        do
+        {
+          display.fillScreen(GxEPD_WHITE);
+          display.setCursor(10, 40);
+          display.println("UPLOADING NEW BOOK");
+        } while (display.nextPage());
+        UpdateBook();
+        delay(3000);
+        PrintWord(0);
+        i = 0;
+        EEPROM.write(10, i);
+        delay(1);
+        EEPROM.commit();
+      }
+    }
+    break;
+  }
+}
+
+//显示时间
+void GetTime()
+{
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo))
+  {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  // Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  data = timeinfo.tm_hour;
+  data += ":";
+  data += timeinfo.tm_min;
+  display.firstPage();
+  display.setPartialWindow(0, 0, display.width(), display.height());
+  u8g2Fonts.setFont(u8g2_font_inb53_mr);
+  u8g2Fonts.setCursor(13, 90);
+  // display.setCursor(30,34);
+  // display.setTextSize(8);
+  do
+  {
+    u8g2Fonts.println(data.c_str());
+  } while (display.nextPage());
+  Serial.println(data.c_str());
+}
+
+//双击按键事件中断出发函数
+void handler(Button2 &btn)
+{
+  if (flag == 1)
+  {
+    flag = 2;
+    display.setFullWindow();
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+    } while (display.nextPage());
+    PrintWord(i);
+  }
+  else if (flag == 2)
+  {
+    flag = 1;
+    display.setFullWindow();
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+    } while (display.nextPage());
+    GetTime();
+  }
+}
+
+
 //程序总启动
 void setup()
 {
@@ -380,22 +424,29 @@ void setup()
   digitalWrite(26, HIGH);
   pinMode(27, OUTPUT);
   digitalWrite(27, HIGH);
+  PageChoose.begin(21,PULLUP);
+  PageChoose.setPressedHandler(handler);
   i = EEPROM.read(10);
   GetBookList();
-  PrintWord(i);
+  // PrintWord(i);
   // CorrectAdc();
-  web_setup();
+  // web_setup();
   // timeClient.begin();
   configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
-  // GetTime();
+  GetTime();
 }
+
+/* 将时钟设置为flag为1
+  词典设置为FLAG为2
+*/
 
 //程序总循环
 void loop()
 {
-  Button();
+  PageChoose.loop();
+  Button(flag);
   // GetVoltage();
-  server.handleClient();
+  // server.handleClient();
   // timeClient.update();
   // printLocalTime();
 }
