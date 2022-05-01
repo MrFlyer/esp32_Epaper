@@ -7,7 +7,8 @@
                 6.支持WEB上传文件（还没测试
                 7.支持时钟显示
 
-    已知bug：单双击问题没解决，当到整点时候会重复全局刷新
+    已知bug：单双击问题没解决，
+    当到整点时候会重复全局刷新(已经修好)
 */
 
 #include <Arduino.h>
@@ -227,9 +228,8 @@ void printLocalTime()
   data = timeinfo.tm_hour;
   data += ":";
   data += timeinfo.tm_min;
-  if (timeinfo.tm_sec == 0 && temp == 0) //当时间到达0秒的时候局刷分
+  if (timeinfo.tm_sec == 0) //当时间到达0秒的时候局刷分
   {
-    temp = 1;
     display.firstPage();
     display.setPartialWindow(0, 0, display.width(), display.height());
     u8g2Fonts.setFont(u8g2_font_inb53_mr);
@@ -242,13 +242,11 @@ void printLocalTime()
     } while (display.nextPage());
     Serial.println(data.c_str());
   }
-  else if (timeinfo.tm_sec != 0)
+  if (timeinfo.tm_min % 10 == 0 && temp == 0) //当分钟达到整时时候，做一次全刷
   {
-    temp = 0;
-  }
-  if (timeinfo.tm_min % 10 == 0) //当分钟达到整时时候，做一次全刷
-  {
+    temp = 1;
     display.setFullWindow();
+    display.fillScreen(GxEPD_WHITE);
     display.firstPage();
     u8g2Fonts.setFont(u8g2_font_inb53_mr);
     u8g2Fonts.setCursor(13, 90);
@@ -259,6 +257,12 @@ void printLocalTime()
       u8g2Fonts.println(data.c_str());
     } while (display.nextPage());
   }
+  if (timeinfo.tm_min % 10 != 0)
+  {
+    temp = 0;
+  }
+
+
 }
 
 //按键事件检测连带文件溢出检测
