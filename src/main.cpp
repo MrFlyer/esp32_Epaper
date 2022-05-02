@@ -23,6 +23,8 @@
 #include <NTPClient.h>
 #include <Button2.h> //单击双击按键库
 #include <WiFi.h>
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
 #include <WebUpload.h> //web上传
 #include <GetBatVal.h> //获取当前电量
 
@@ -442,6 +444,7 @@ void setup()
   // timeClient.begin();
   configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
   GetTime();
+
 }
 
 /* 将时钟设置为flag为1
@@ -457,4 +460,5 @@ void loop()
   // server.handleClient();
   // timeClient.update();
   // printLocalTime();
+
 }
