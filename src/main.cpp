@@ -21,10 +21,10 @@
 #include <U8g2_for_Adafruit_GFX.h> //字体库
 #include <EEPROM.h>                //存储当前页数
 #include <NTPClient.h>
-#include <Button2.h> //单击双击按键库
-#include <WiFi.h>
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
+#include <Button2.h> //单击双击按键库
+#include <WiFi.h>
 #include <WebUpload.h> //web上传
 #include <GetBatVal.h> //获取当前电量
 
@@ -37,6 +37,10 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(/*CS=D8
 U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
 
 Button2 MethodChoose, NextWord, LastWord;
+
+HTTPClient https;
+
+StaticJsonDocument<768> doc;
 
 // WiFiUDP ntpUDP; // 创建一个WIFI UDP连接
 
@@ -263,8 +267,6 @@ void printLocalTime()
   {
     temp = 0;
   }
-
-
 }
 
 //按键事件检测连带文件溢出检测
@@ -387,6 +389,77 @@ void GetTime()
   Serial.println(data.c_str());
 }
 
+
+
+void PrintWeather(String now_icon)
+{
+  Serial.println("进入绘画天气");
+  u8g2Fonts.setFont(u8g2_font_open_iconic_weather_4x_t);
+  int icon_txt = now_icon.toInt();
+  Serial.println(icon_txt);
+  if (icon_txt == 100) //白天晴
+  {
+    u8g2Fonts.drawGlyph(0,0,69);
+  }
+  else if (icon_txt == 150) //夜晚晴
+  {
+    u8g2Fonts.drawGlyph(0,48,66);
+  }
+  else if (icon_txt == 101 || icon_txt == 151 || icon_txt == 154) //多云
+  {
+    u8g2Fonts.drawGlyph(0,0,64);
+  }
+  else if (icon_txt == 102 || icon_txt == 103 || icon_txt == 152 || icon_txt == 153) //少云
+  {
+    u8g2Fonts.drawGlyph(0,0,65);
+  }
+  else if (icon_txt >= 300 && icon_txt < 400) //下雨
+  {
+    u8g2Fonts.drawGlyph(0,0,67);
+  }
+  else if (icon_txt >= 400 && icon_txt < 1000) //下雪或者其他天气
+  {
+    u8g2Fonts.drawGlyph(0,0,68);
+  }
+}
+
+void GetWeath()
+{
+  https.begin("https://devapi.qweather.com/v7/weather/now?location=101030100&key=30625228fb9340a1a538fa03449cb08d");
+  https.setUserAgent("Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36");
+  int httpCode = https.GET();
+  if (httpCode == HTTP_CODE_OK)
+  {
+    String retData = https.getString();
+    deserializeJson(doc, retData);
+    JsonObject obj1 = doc.as<JsonObject>();
+    String code = obj1["code"];
+    String now_icon = obj1["now"]["icon"];
+    Serial.println(httpCode);
+    Serial.println(code);
+    String a = "150";
+    PrintWeather(a);
+  }
+  https.end();
+}
+
+// void AnalogData()
+// {
+//   display.fillScreen(GxEPD_WHITE);
+//   char *code = doc["code"];             // "200"
+//   char *updateTime = doc["updateTime"]; // "2022-05-02T14:52+08:00"
+//   JsonObject now = doc["now"];
+//   char *now_temp = now["temp"];           // "25"
+//   char *now_feelsLike = now["feelsLike"]; // "22"
+//   char *now_icon = now["icon"];           // "100"
+//   char *now_text = now["text"];           // "晴"
+//   char *now_windDir = now["windDir"];     // "西南风"
+//   char *now_windScale = now["windScale"]; // "3"
+//   char *now_humidity = now["humidity"];   // "25"
+//   Serial.println(now_icon);
+//   PrintWeather(code, updateTime, now_temp, now_feelsLike, now_icon, now_text, now_windDir, now_windScale, now_humidity);
+// }
+
 //双击按键事件中断出发函数
 void handler(Button2 &btn)
 {
@@ -414,6 +487,7 @@ void handler(Button2 &btn)
   }
 }
 
+//按键初始化
 void Button_init()
 {
   pinMode(25, OUTPUT);
@@ -443,8 +517,9 @@ void setup()
   // web_setup();
   // timeClient.begin();
   configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
-  GetTime();
-
+  // GetTime();
+  GetWeath();
+  // AnalogData();
 }
 
 /* 将时钟设置为flag为1
@@ -454,11 +529,8 @@ void setup()
 //程序总循环
 void loop()
 {
-  MethodChoose.loop();
-  Button(flag);
+  // MethodChoose.loop();
+  // Button(flag);
   // GetVoltage();
   // server.handleClient();
-  // timeClient.update();
-  // printLocalTime();
-
 }
