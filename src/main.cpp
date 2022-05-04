@@ -430,13 +430,13 @@ void GetWeath()
   int httpCode = https.GET();
   if (httpCode == HTTP_CODE_OK)
   {
-    String retData = https.getString();
-    deserializeJson(doc, retData);
-    JsonObject obj1 = doc.as<JsonObject>();
-    String code = obj1["code"];
-    String now_icon = obj1["now"]["icon"];
+    String payload  = https.getString();
+    deserializeJson(doc, payload);
+    // JsonObject obj1 = doc.as<JsonObject>();
+    String code = doc["code"];
+    String now_icon = doc["now"]["icon"];
     Serial.println(httpCode);
-    Serial.println(code);
+    Serial.println(payload);
     String a = "150";
     PrintWeather(a);
   }
