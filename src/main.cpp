@@ -40,7 +40,7 @@ Button2 MethodChoose, NextWord, LastWord;
 
 HTTPClient https;
 
-StaticJsonDocument<768> doc;
+StaticJsonDocument<512> doc;
 
 // WiFiUDP ntpUDP; // 创建一个WIFI UDP连接
 
@@ -57,6 +57,14 @@ vector<String> v;
 String data;
 
 int temp = 0;
+
+struct WetherData
+{
+    char city[32];
+    char weather[64];
+    char code[32];
+    char temperature[32];
+};
 
 //启动wifi打印链接ip
 void WiFi_Booting()
@@ -432,15 +440,29 @@ void GetWeath()
   if (httpCode == HTTP_CODE_OK)
   {
     String payload  = https.getString();
-    // deserializeJson(doc, payload);
+    deserializeJson(doc, payload);
     // JsonObject obj1 = doc.as<JsonObject>();
     // String code = doc["code"];
     // String now_icon = doc["now"]["icon"];
-    delay(500);
+    // delay(500);
     Serial.println(httpCode);
     Serial.println(payload);
-    String a = "150";
-    PrintWeather(a);
+    // String a = "150";
+    // PrintWeather(a);
+    struct WetherData weatherdata = {0};
+    strcpy(weatherdata.city, doc["results"][0]["location"]["name"].as<const char*>());
+    strcpy(weatherdata.weather, doc["results"][0]["now"]["text"].as<const char*>());
+    strcpy(weatherdata.code, doc["results"][0]["now"]["code"].as<const char*>());
+    strcpy(weatherdata.temperature, doc["results"][0]["now"]["temperature"].as<const char*>());
+
+    Serial.println("City");
+    Serial.println(weatherdata.city);
+    Serial.println("weather");
+    Serial.println(weatherdata.weather);
+    Serial.println("CODE");
+    Serial.println(weatherdata.code);
+    Serial.println("temperature");
+    Serial.println(weatherdata.temperature);
   }
   https.end();
 }
