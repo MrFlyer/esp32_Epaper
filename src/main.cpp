@@ -425,16 +425,18 @@ void PrintWeather(String now_icon)
 
 void GetWeath()
 {
-  https.begin("https://devapi.qweather.com/v7/weather/now?location=101030100&key=30625228fb9340a1a538fa03449cb08d");
+  // https.begin("https://devapi.qweather.com/v7/weather/now?location=101030100&key=30625228fb9340a1a538fa03449cb08d");
+  https.begin("https://api.seniverse.com/v3/weather/now.json?key=SR7QxU9_RUOvkrbza&location=tianjin&language=zh-Hans&unit=c");
   https.setUserAgent("Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36");
   int httpCode = https.GET();
   if (httpCode == HTTP_CODE_OK)
   {
     String payload  = https.getString();
-    deserializeJson(doc, payload);
+    // deserializeJson(doc, payload);
     // JsonObject obj1 = doc.as<JsonObject>();
-    String code = doc["code"];
-    String now_icon = doc["now"]["icon"];
+    // String code = doc["code"];
+    // String now_icon = doc["now"]["icon"];
+    delay(500);
     Serial.println(httpCode);
     Serial.println(payload);
     String a = "150";
