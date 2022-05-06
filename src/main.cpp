@@ -411,7 +411,12 @@ void PrintWeather(String now_icon)
   }
   else if (icon_txt == 150) //夜晚晴
   {
-    u8g2Fonts.drawGlyph(0,48,66);
+    display.firstPage();
+    do
+    {
+      u8g2Fonts.drawGlyph(0,48,0x0045);
+    } while (display.nextPage());
+
   }
   else if (icon_txt == 101 || icon_txt == 151 || icon_txt == 154) //多云
   {
@@ -470,6 +475,8 @@ void AnalogData()
     Serial.println(weatherdata.code);
     Serial.println("temperature");
     Serial.println(weatherdata.temperature);
+    String a = "150";
+    PrintWeather(a);
 }
 
 //双击按键事件中断出发函数
