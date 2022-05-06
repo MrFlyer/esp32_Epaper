@@ -60,10 +60,10 @@ int temp = 0;
 
 struct WetherData
 {
-    char city[32];
-    char weather[64];
-    char code[32];
-    char temperature[32];
+  char city[32];
+  char weather[64];
+  char code[32];
+  char temperature[32];
 };
 
 //启动wifi打印链接ip
@@ -85,30 +85,8 @@ void WiFi_Booting()
   {
     delay(1000);
   }
-  // do
-  // {
-  //   display.println("CONNECTED IP:");
-  //   display.println(WiFi.localIP());
-  //   display.setTextSize(3);
-  //   delay(1000);
-  //   display.println("ENJOY!");
-  // } while (display.nextPage());
-  // do
-  // {
-  //   display.setTextSize(2);
-  //   display.println("Will Close in 5s");
-  // } while (display.nextPage());
-
-  // delay(5000);
-  // // Flush ALL Screen
-  display.setFullWindow();
-  display.firstPage();
-  do
-  {
-    display.fillScreen(GxEPD_WHITE);
-  } while (display.nextPage());
+  display.fillScreen(GxEPD_WHITE);
 }
-
 //获取书目列表并且存入动态大小数组V中
 void GetBookList()
 {
@@ -397,63 +375,50 @@ void GetTime()
   Serial.println(data.c_str());
 }
 
-
-
-void PrintWeather(String now_icon)
+void PrintWeather(String now_icon, String now_temp)
 {
   Serial.println("进入绘画天气");
   u8g2Fonts.setFont(u8g2_font_open_iconic_weather_8x_t);
   int icon_txt = now_icon.toInt();
   Serial.println(icon_txt);
-  display.setPartialWindow(0,0,display.width(),display.height());
-  if (icon_txt == 0) //白天晴
-  {
-    display.firstPage();
-    do
+  display.setPartialWindow(0, 0, display.width(), display.height());
+  // display.firstPage();
+  // do
+  // {
+    if (icon_txt == 0) //白天晴
     {
-      u8g2Fonts.drawGlyph(15,90,0x0045);
-    } while (display.nextPage());
-  }
-  else if (icon_txt == 150) //夜晚晴
-  {
-    display.firstPage();
-    do
+      u8g2Fonts.drawGlyph(15, 90, 0x0045);
+    }
+    else if (icon_txt == 150) //夜晚晴
     {
-      u8g2Fonts.drawGlyph(15,90,0x0042);
-    } while (display.nextPage());
-  }
-  else if (icon_txt == 4 || icon_txt == 9) //多云
-  {
-    display.firstPage();
-    do
+      u8g2Fonts.drawGlyph(15, 90, 0x0042);
+    }
+    else if (icon_txt == 4 || icon_txt == 9) //多云
     {
-      u8g2Fonts.drawGlyph(15,90,0x0040);
-    } while (display.nextPage());
-  }
-  else if (icon_txt == 5 || icon_txt == 6 || icon_txt == 7 || icon_txt == 8) //少云
-  {
-    display.firstPage();
-    do
+      u8g2Fonts.drawGlyph(15, 90, 0x0040);
+    }
+    else if (icon_txt == 5 || icon_txt == 6 || icon_txt == 7 || icon_txt == 8) //少云
     {
-      u8g2Fonts.drawGlyph(15,90,0x0041);
-    } while (display.nextPage());
-  }
-  else if (icon_txt >= 10 && icon_txt <= 20) //下雨
-  {
-    display.firstPage();
-    do
+      u8g2Fonts.drawGlyph(15, 90, 0x0041);
+    }
+    else if (icon_txt >= 10 && icon_txt <= 20) //下雨
     {
-      u8g2Fonts.drawGlyph(15,90,0x0043);
-    } while (display.nextPage());
-  }
-  else if (icon_txt >= 400 && icon_txt < 1000) //下雪或者其他天气
-  {
-    display.firstPage();
-    do
+      u8g2Fonts.drawGlyph(15, 90, 0x0043);
+    }
+    else if (icon_txt >= 400 && icon_txt < 1000) //下雪或者其他天气
     {
-      u8g2Fonts.drawGlyph(15,90,0x0044);
-    } while (display.nextPage());
-  }
+      u8g2Fonts.drawGlyph(15, 90, 0x0044);
+    }
+
+  u8g2Fonts.setFont(u8g2_font_wqy16_t_gb2312b);
+  u8g2Fonts.setCursor(100, 50);
+  String wea_temp = now_temp;
+  wea_temp += "度";
+  u8g2Fonts.print(wea_temp);
+  display.nextPage();
+
+
+  // } while (display.nextPage());
 }
 
 void GetWeath()
@@ -464,7 +429,7 @@ void GetWeath()
   int httpCode = https.GET();
   if (httpCode == HTTP_CODE_OK)
   {
-    String payload  = https.getString();
+    String payload = https.getString();
     deserializeJson(doc, payload);
     // JsonObject obj1 = doc.as<JsonObject>();
     // String code = doc["code"];
@@ -474,28 +439,27 @@ void GetWeath()
     Serial.println(payload);
     // String a = "150";
     // PrintWeather(a);
-
   }
   https.end();
 }
 
 void AnalogData()
 {
-    struct WetherData weatherdata = {0};
-    strcpy(weatherdata.city, doc["results"][0]["location"]["name"].as<const char*>());
-    strcpy(weatherdata.weather, doc["results"][0]["now"]["text"].as<const char*>());
-    strcpy(weatherdata.code, doc["results"][0]["now"]["code"].as<const char*>());
-    strcpy(weatherdata.temperature, doc["results"][0]["now"]["temperature"].as<const char*>());
+  struct WetherData weatherdata = {0};
+  strcpy(weatherdata.city, doc["results"][0]["location"]["name"].as<const char *>());
+  strcpy(weatherdata.weather, doc["results"][0]["now"]["text"].as<const char *>());
+  strcpy(weatherdata.code, doc["results"][0]["now"]["code"].as<const char *>());
+  strcpy(weatherdata.temperature, doc["results"][0]["now"]["temperature"].as<const char *>());
 
-    Serial.println("City");
-    Serial.println(weatherdata.city);
-    Serial.println("weather");
-    Serial.println(weatherdata.weather);
-    Serial.println("CODE");
-    Serial.println(weatherdata.code);
-    Serial.println("temperature");
-    Serial.println(weatherdata.temperature);
-    PrintWeather(weatherdata.code);
+  Serial.println("City");
+  Serial.println(weatherdata.city);
+  Serial.println("weather");
+  Serial.println(weatherdata.weather);
+  Serial.println("CODE");
+  Serial.println(weatherdata.code);
+  Serial.println("temperature");
+  Serial.println(weatherdata.temperature);
+  PrintWeather(weatherdata.code,weatherdata.temperature);
 }
 
 //双击按键事件中断出发函数
