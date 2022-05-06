@@ -449,6 +449,13 @@ void GetWeath()
     Serial.println(payload);
     // String a = "150";
     // PrintWeather(a);
+
+  }
+  https.end();
+}
+
+void AnalogData()
+{
     struct WetherData weatherdata = {0};
     strcpy(weatherdata.city, doc["results"][0]["location"]["name"].as<const char*>());
     strcpy(weatherdata.weather, doc["results"][0]["now"]["text"].as<const char*>());
@@ -463,26 +470,7 @@ void GetWeath()
     Serial.println(weatherdata.code);
     Serial.println("temperature");
     Serial.println(weatherdata.temperature);
-  }
-  https.end();
 }
-
-// void AnalogData()
-// {
-//   display.fillScreen(GxEPD_WHITE);
-//   char *code = doc["code"];             // "200"
-//   char *updateTime = doc["updateTime"]; // "2022-05-02T14:52+08:00"
-//   JsonObject now = doc["now"];
-//   char *now_temp = now["temp"];           // "25"
-//   char *now_feelsLike = now["feelsLike"]; // "22"
-//   char *now_icon = now["icon"];           // "100"
-//   char *now_text = now["text"];           // "晴"
-//   char *now_windDir = now["windDir"];     // "西南风"
-//   char *now_windScale = now["windScale"]; // "3"
-//   char *now_humidity = now["humidity"];   // "25"
-//   Serial.println(now_icon);
-//   PrintWeather(code, updateTime, now_temp, now_feelsLike, now_icon, now_text, now_windDir, now_windScale, now_humidity);
-// }
 
 //双击按键事件中断出发函数
 void handler(Button2 &btn)
@@ -543,7 +531,7 @@ void setup()
   configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
   // GetTime();
   GetWeath();
-  // AnalogData();
+  AnalogData();
 }
 
 /* 将时钟设置为flag为1
