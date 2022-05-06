@@ -402,37 +402,57 @@ void GetTime()
 void PrintWeather(String now_icon)
 {
   Serial.println("进入绘画天气");
-  u8g2Fonts.setFont(u8g2_font_open_iconic_weather_4x_t);
+  u8g2Fonts.setFont(u8g2_font_open_iconic_weather_8x_t);
   int icon_txt = now_icon.toInt();
   Serial.println(icon_txt);
-  if (icon_txt == 100) //白天晴
+  display.setPartialWindow(0,0,display.width(),display.height());
+  if (icon_txt == 0) //白天晴
   {
-    u8g2Fonts.drawGlyph(0,0,69);
+    display.firstPage();
+    do
+    {
+      u8g2Fonts.drawGlyph(15,90,0x0045);
+    } while (display.nextPage());
   }
   else if (icon_txt == 150) //夜晚晴
   {
     display.firstPage();
     do
     {
-      u8g2Fonts.drawGlyph(0,48,0x0045);
+      u8g2Fonts.drawGlyph(15,90,0x0042);
     } while (display.nextPage());
-
   }
-  else if (icon_txt == 101 || icon_txt == 151 || icon_txt == 154) //多云
+  else if (icon_txt == 4 || icon_txt == 9) //多云
   {
-    u8g2Fonts.drawGlyph(0,0,64);
+    display.firstPage();
+    do
+    {
+      u8g2Fonts.drawGlyph(15,90,0x0040);
+    } while (display.nextPage());
   }
-  else if (icon_txt == 102 || icon_txt == 103 || icon_txt == 152 || icon_txt == 153) //少云
+  else if (icon_txt == 5 || icon_txt == 6 || icon_txt == 7 || icon_txt == 8) //少云
   {
-    u8g2Fonts.drawGlyph(0,0,65);
+    display.firstPage();
+    do
+    {
+      u8g2Fonts.drawGlyph(15,90,0x0041);
+    } while (display.nextPage());
   }
-  else if (icon_txt >= 300 && icon_txt < 400) //下雨
+  else if (icon_txt >= 10 && icon_txt <= 20) //下雨
   {
-    u8g2Fonts.drawGlyph(0,0,67);
+    display.firstPage();
+    do
+    {
+      u8g2Fonts.drawGlyph(15,90,0x0043);
+    } while (display.nextPage());
   }
   else if (icon_txt >= 400 && icon_txt < 1000) //下雪或者其他天气
   {
-    u8g2Fonts.drawGlyph(0,0,68);
+    display.firstPage();
+    do
+    {
+      u8g2Fonts.drawGlyph(15,90,0x0044);
+    } while (display.nextPage());
   }
 }
 
@@ -475,8 +495,7 @@ void AnalogData()
     Serial.println(weatherdata.code);
     Serial.println("temperature");
     Serial.println(weatherdata.temperature);
-    String a = "150";
-    PrintWeather(a);
+    PrintWeather(weatherdata.code);
 }
 
 //双击按键事件中断出发函数
