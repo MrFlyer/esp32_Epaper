@@ -375,7 +375,7 @@ void GetTime()
   Serial.println(data.c_str());
 }
 
-void PrintWeather(String now_icon, String now_temp)
+void PrintWeather(String now_icon, String now_temp, String city, String weather)
 {
   Serial.println("进入绘画天气");
   u8g2Fonts.setFont(u8g2_font_open_iconic_weather_8x_t);
@@ -410,11 +410,21 @@ void PrintWeather(String now_icon, String now_temp)
       u8g2Fonts.drawGlyph(15, 90, 0x0044);
     }
 
-  u8g2Fonts.setFont(u8g2_font_wqy16_t_gb2312b);
-  u8g2Fonts.setCursor(100, 50);
+  u8g2Fonts.setFont(u8g2_font_logisoso78_tn);
+  u8g2Fonts.setCursor(100, 90);
   String wea_temp = now_temp;
-  wea_temp += "度";
   u8g2Fonts.print(wea_temp);
+  // wea_temp += "度";
+  display.drawCircle(210,60,6,GxEPD_BLACK);
+  u8g2Fonts.setFont(u8g2_font_inr24_mr);
+  u8g2Fonts.setCursor(217,82);
+  u8g2Fonts.print("C");
+  u8g2Fonts.setFont(u8g2_font_wqy16_t_gb2312b);
+  u8g2Fonts.setCursor(130,120);
+  u8g2Fonts.print(city);
+  u8g2Fonts.setFont(u8g2_font_wqy16_t_gb2312b);
+  u8g2Fonts.setCursor(170,120);
+  u8g2Fonts.print(weather);
   display.nextPage();
 
 
@@ -459,7 +469,7 @@ void AnalogData()
   Serial.println(weatherdata.code);
   Serial.println("temperature");
   Serial.println(weatherdata.temperature);
-  PrintWeather(weatherdata.code,weatherdata.temperature);
+  PrintWeather(weatherdata.code,weatherdata.temperature,weatherdata.city,weatherdata.weather);
 }
 
 //双击按键事件中断出发函数
