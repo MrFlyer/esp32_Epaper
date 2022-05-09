@@ -531,7 +531,7 @@ void setup()
   configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
   // GetTime();
   GetWeath();
-  AnalogData();
+  // AnalogData();
 }
 
 /* 将时钟设置为flag为1
@@ -541,8 +541,8 @@ void setup()
 //程序总循环
 void loop()
 {
-  // MethodChoose.loop();
-  // Button(flag);
+  MethodChoose.loop();
+  Button(flag);
   // GetVoltage();
   // server.handleClient();
 }
