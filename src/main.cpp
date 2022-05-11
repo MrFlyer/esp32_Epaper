@@ -263,8 +263,7 @@ void Button(int page)
   case 1:
     printLocalTime();
     break;
-
-  case 2:
+  case 3:
     if (digitalRead(25) == LOW) //下一页
     {
       delay(200);
@@ -385,48 +384,47 @@ void PrintWeather(String now_icon, String now_temp, String city, String weather)
   // display.firstPage();
   // do
   // {
-    if (icon_txt == 0) //白天晴
-    {
-      u8g2Fonts.drawGlyph(15, 90, 0x0045);
-    }
-    else if (icon_txt == 150) //夜晚晴
-    {
-      u8g2Fonts.drawGlyph(15, 90, 0x0042);
-    }
-    else if (icon_txt == 4 || icon_txt == 9) //多云
-    {
-      u8g2Fonts.drawGlyph(15, 90, 0x0040);
-    }
-    else if (icon_txt == 5 || icon_txt == 6 || icon_txt == 7 || icon_txt == 8) //少云
-    {
-      u8g2Fonts.drawGlyph(15, 90, 0x0041);
-    }
-    else if (icon_txt >= 10 && icon_txt <= 20) //下雨
-    {
-      u8g2Fonts.drawGlyph(15, 90, 0x0043);
-    }
-    else if (icon_txt >= 400 && icon_txt < 1000) //下雪或者其他天气
-    {
-      u8g2Fonts.drawGlyph(15, 90, 0x0044);
-    }
+  if (icon_txt == 0) //白天晴
+  {
+    u8g2Fonts.drawGlyph(15, 90, 0x0045);
+  }
+  else if (icon_txt == 150) //夜晚晴
+  {
+    u8g2Fonts.drawGlyph(15, 90, 0x0042);
+  }
+  else if (icon_txt == 4 || icon_txt == 9) //多云
+  {
+    u8g2Fonts.drawGlyph(15, 90, 0x0040);
+  }
+  else if (icon_txt == 5 || icon_txt == 6 || icon_txt == 7 || icon_txt == 8) //少云
+  {
+    u8g2Fonts.drawGlyph(15, 90, 0x0041);
+  }
+  else if (icon_txt >= 10 && icon_txt <= 20) //下雨
+  {
+    u8g2Fonts.drawGlyph(15, 90, 0x0043);
+  }
+  else if (icon_txt >= 400 && icon_txt < 1000) //下雪或者其他天气
+  {
+    u8g2Fonts.drawGlyph(15, 90, 0x0044);
+  }
 
   u8g2Fonts.setFont(u8g2_font_logisoso78_tn);
   u8g2Fonts.setCursor(100, 90);
   String wea_temp = now_temp;
   u8g2Fonts.print(wea_temp);
   // wea_temp += "度";
-  display.drawCircle(210,60,6,GxEPD_BLACK);
+  display.drawCircle(210, 60, 6, GxEPD_BLACK);
   u8g2Fonts.setFont(u8g2_font_inr24_mr);
-  u8g2Fonts.setCursor(217,82);
+  u8g2Fonts.setCursor(217, 82);
   u8g2Fonts.print("C");
   u8g2Fonts.setFont(u8g2_font_wqy16_t_gb2312b);
-  u8g2Fonts.setCursor(130,120);
+  u8g2Fonts.setCursor(130, 120);
   u8g2Fonts.print(city);
   u8g2Fonts.setFont(u8g2_font_wqy16_t_gb2312b);
-  u8g2Fonts.setCursor(170,120);
+  u8g2Fonts.setCursor(170, 120);
   u8g2Fonts.print(weather);
   display.nextPage();
-
 
   // } while (display.nextPage());
 }
@@ -455,6 +453,7 @@ void GetWeath()
 
 void AnalogData()
 {
+  Serial.println("进入获取天气数据");
   struct WetherData weatherdata = {0};
   strcpy(weatherdata.city, doc["results"][0]["location"]["name"].as<const char *>());
   strcpy(weatherdata.weather, doc["results"][0]["now"]["text"].as<const char *>());
@@ -469,26 +468,21 @@ void AnalogData()
   Serial.println(weatherdata.code);
   Serial.println("temperature");
   Serial.println(weatherdata.temperature);
-  PrintWeather(weatherdata.code,weatherdata.temperature,weatherdata.city,weatherdata.weather);
+  PrintWeather(weatherdata.code, weatherdata.temperature, weatherdata.city, weatherdata.weather);
 }
 
 //双击按键事件中断出发函数
 void handler(Button2 &btn)
 {
-  if (flag == 1)
-  {
-    flag = 2;
-    display.setFullWindow();
-    display.firstPage();
-    do
-    {
-      display.fillScreen(GxEPD_WHITE);
-    } while (display.nextPage());
-    PrintWord(i);
-  }
-  else if (flag == 2)
+  flag++;
+  if (flag == 4)
   {
     flag = 1;
+  }
+  Serial.println("判断完成");
+  switch (flag)
+  {
+  case 1:
     display.setFullWindow();
     display.firstPage();
     do
@@ -496,7 +490,44 @@ void handler(Button2 &btn)
       display.fillScreen(GxEPD_WHITE);
     } while (display.nextPage());
     GetTime();
+    break;
+
+  case 2:
+    display.fillScreen(GxEPD_WHITE);
+    AnalogData();
+    break;
+  case 3:
+    display.setFullWindow();
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+    } while (display.nextPage());
+    PrintWord(i);
+    break;
   }
+  // if (flag == 1)
+  // {
+  //   flag = 2;
+  //   display.setFullWindow();
+  //   display.firstPage();
+  //   do
+  //   {
+  //     display.fillScreen(GxEPD_WHITE);
+  //   } while (display.nextPage());
+  //   PrintWord(i);
+  // }
+  // else if (flag == 2)
+  // {
+  //   flag = 1;
+  //   display.setFullWindow();
+  //   display.firstPage();
+  //   do
+  //   {
+  //     display.fillScreen(GxEPD_WHITE);
+  //   } while (display.nextPage());
+  //   GetTime();
+  // }
 }
 
 //按键初始化
@@ -508,7 +539,7 @@ void Button_init()
   digitalWrite(26, HIGH);
   MethodChoose.begin(27, PULLUP);
   MethodChoose.setPressedHandler(handler);
-  MethodChoose.setDoubleClickHandler(UpdateBook);
+  // MethodChoose.setDoubleClickHandler(UpdateBook);
 }
 
 //程序总启动
@@ -529,13 +560,15 @@ void setup()
   // web_setup();
   // timeClient.begin();
   configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
-  // GetTime();
+  GetTime();
   GetWeath();
   // AnalogData();
 }
 
 /* 将时钟设置为flag为1
-  词典设置为FLAG为2
+  天气设置flag为2
+  词典设置为FLAG为3
+
 */
 
 //程序总循环
@@ -544,5 +577,5 @@ void loop()
   MethodChoose.loop();
   Button(flag);
   // GetVoltage();
-  // server.handleClient();
+  server.handleClient();
 }
