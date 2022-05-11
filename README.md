@@ -8,7 +8,9 @@
 - 支持中文输入
 - 支持存储目前页数保存当前进度
 - 支持WEB上传文件（还没测试
+- 支持三个页面循环切换
 - 支持天气显示
+- 支持时间显示
 
 ### 通过淘宝购买了GxEPD2_213_B74驱动全新墨水屏，比nm辣鸡汉朔拆机好太多倍了
 
@@ -21,6 +23,6 @@
 - zinggjm/GxEPD2@^1.4.5
 - olikraus/U8g2@^2.32.15
 - olikraus/U8g2_for_Adafruit_GFX@^1.8.0
-- arduino-libraries/NTPClient@^3.1.0	
+- arduino-libraries/NTPClient@^3.1.0
 - lennarthennigs/Button2@^2.0.1
 
