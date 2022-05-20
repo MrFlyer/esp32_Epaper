@@ -47,14 +47,14 @@ def changeData(msg_data):
 def get_data():
     return jsonify(getdata())
 
+
 @app.route('/changedata', methods=["GET"])
 def change_data():
     if request.method == 'GET':
         json_data = request.args.get("todo")
         print(json_data)
         changeData(json_data)
-        return 'OK'
-
+        return jsonify(getdata())
 
 
 if __name__ == '__main__':
