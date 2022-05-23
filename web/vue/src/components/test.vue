@@ -1,14 +1,19 @@
 <template>
     <div id="all">
-        {{ msg }}
-        <button v-on:click="getdata()">
-            写点啥
-        </button>
-        <ol>
-            <li v-bind:key="todo" v-for="todo in todolist">
-                {{ todo }}
+        <p id="font">{{ msg }}</p>
+        <el-button type="primary" v-on:click="getdata()" id="but">
+            瞅瞅有没有啥忘得
+        </el-button>
+        <ul style="list-style-type: none;padding:0; margin:0;">
+            <li v-bind:key="todo" v-for="todo in todolist" id="list">
+                <el-tag closable>
+                    {{ todo }}
+                </el-tag>
             </li>
-        </ol>
+        </ul>
+        <!-- <el-table :data="todolist" style="width: 100%">
+            <el-table-column  prop="" label="待办事项" width="180"></el-table-column>
+        </el-table> -->
     </div>
 </template>
 
@@ -22,7 +27,7 @@ export default {
     data() {
         return {
             a : 0,
-            msg: 'hellodwwd',
+            msg: '来看看备忘录里面有点嘛',
             todolist : ''
         };
     },
@@ -54,3 +59,27 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+#list{
+    margin-bottom: 10px;
+    size: mini;
+    /* width: 30px; */
+    text-align: center;
+}
+#but{
+    margin-top: 10px;
+    margin-bottom: 30px;
+    size:mini;
+    width: 50%;
+    font-size: 150%;
+
+
+}
+#font{
+    /* font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif; */
+    font-family: "font_family" !important;
+    font-size: 40px;
+    font-style: normal;
+}
+</style>
