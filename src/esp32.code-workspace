@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"name": "esp32_Epaper",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"LED.C": "cpp",
+			"array": "cpp",
+			"deque": "cpp",
+			"string": "cpp",
+			"unordered_map": "cpp",
+			"unordered_set": "cpp",
+			"vector": "cpp",
+			"string_view": "cpp",
+			"initializer_list": "cpp"
+		}
+	}
+}

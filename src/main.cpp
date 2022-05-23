@@ -30,6 +30,8 @@
 
 //定义使用的汉朔2.13拆机屏(这屏幕纯纯贴贵物)
 // 目前使用某宝购买的2.13寸GxEPD2_213_B74驱动屏幕，简直nm太清楚了
+// GxEPD2_BW<GxEPD2_213_B72, GxEPD2_213_B72::HEIGHT> display(GxEPD2_213_B72(/*CS=D8*/ SS, /*DC=D3*/ 13, /*RST=D4*/ 14, /*BUSY=D2*/ 19)); // GDEH0213B72
+
 GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(/*CS=D8*/ SS, /*DC=D3*/ 13, /*RST=D4*/ 14, /*BUSY=D2*/ 19)); // GDEH0213B72
 // GxEPD2_3C<GxEPD2_213_Z98c, GxEPD2_213_Z98c::HEIGHT> display(GxEPD2_213_Z98c(/*CS=D8*/ SS, /*DC=D3*/ 13, /*RST=D4*/ 14, /*BUSY=D2*/ 19)); // GDEH0213B72
 
@@ -73,7 +75,7 @@ void WiFi_Booting()
   WiFi.begin(ssid, password);
   display.fillScreen(GxEPD_WHITE);
   display.setTextColor(GxEPD_BLACK);
-  display.setRotation(1);
+  // display.setRotation(1);
   display.setTextSize(2);
   // comment out next line to have no or minimal Adafruit_GFX code
   do
@@ -497,7 +499,7 @@ void handler(Button2 &btn)
     AnalogData();
     break;
   case 3:
-    display.setFullWindow();
+    // display.setFullWindow();
     display.firstPage();
     do
     {
@@ -547,6 +549,7 @@ void setup()
 {
   Serial.begin(115200);
   display.init();
+  display.setRotation(3);
   WiFi_Booting();
   EEPROM.begin(1024);
   u8g2Fonts.begin(display);                  //将u8g2连接到display
