@@ -43,6 +43,20 @@ def changeData(msg_data):
         print(e)
 
 
+def deltData(delt_data):
+    try:
+        connect = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="*<zpA5uw(lGk", database="test",
+                                  charset="utf8")
+        cursor = connect.cursor()
+        sql = "DELETE FROM test.table_name WHERE data=(%s)"
+        cursor.execute(sql, delt_data)
+        connect.commit()
+        cursor.close()
+        connect.close()
+    except Exception as e:
+        print(e)
+
+
 @app.route('/getdata', methods=["GET"])
 def get_data():
     return jsonify({'todolist': getdata()})
@@ -51,10 +65,19 @@ def get_data():
 @app.route('/changedata', methods=["GET"])
 def change_data():
     if request.method == 'GET':
-        json_data = request.args.get("todo")
+        json_data = request.args.get("addtodo")
         print(json_data)
         changeData(json_data)
-        return jsonify(getdata())
+        return jsonify({'todolist': getdata()})
+
+
+@app.route('/deltdata', methods=["GET"])
+def delt_data():
+    if request.method == 'GET':
+        json_data = request.args.get('delttodo')
+        print(json_data)
+        deltData(json_data)
+        return jsonify({'todolist': getdata()})
 
 
 if __name__ == '__main__':
