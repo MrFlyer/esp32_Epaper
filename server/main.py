@@ -8,6 +8,7 @@ app = Flask(__name__)
 app.debug = True
 
 
+# 查数据库目前已有的备忘录列表
 def getdata():
     try:
         connect = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="*<zpA5uw(lGk", database="test",
@@ -29,7 +30,8 @@ def getdata():
         print(e)
 
 
-def changeData(msg_data):
+# 增加新的备忘录条目到数据库中
+def addData(msg_data):
     try:
         connect = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="*<zpA5uw(lGk", database="test",
                                   charset="utf8")
@@ -43,6 +45,7 @@ def changeData(msg_data):
         print(e)
 
 
+# 删除数据库选择到的备忘录条目
 def deltData(delt_data):
     try:
         connect = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="*<zpA5uw(lGk", database="test",
@@ -57,20 +60,23 @@ def deltData(delt_data):
         print(e)
 
 
+# 获取已有目录路由
 @app.route('/getdata', methods=["GET"])
 def get_data():
     return jsonify({'todolist': getdata()})
 
 
-@app.route('/changedata', methods=["GET"])
+# 增添条目路由
+@app.route('/adddata', methods=["GET"])
 def change_data():
     if request.method == 'GET':
         json_data = request.args.get("addtodo")
         print(json_data)
-        changeData(json_data)
+        addData(json_data)
         return jsonify({'todolist': getdata()})
 
 
+# 删除条目路由
 @app.route('/deltdata', methods=["GET"])
 def delt_data():
     if request.method == 'GET':
