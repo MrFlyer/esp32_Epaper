@@ -45,7 +45,7 @@ def changeData(msg_data):
 
 @app.route('/getdata', methods=["GET"])
 def get_data():
-    return jsonify(getdata())
+    return jsonify({'todolist': getdata()})
 
 
 @app.route('/changedata', methods=["GET"])

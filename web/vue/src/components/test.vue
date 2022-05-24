@@ -1,18 +1,28 @@
 <template>
     <div id="all">
-        <p id="font">{{ msg }}</p>
-        <el-button type="primary" v-on:click="getdata()" id="but">
-            瞅瞅有没有啥忘得
-        </el-button>
+        <el-row>
+            <el-col :span="18" :offset="3">
+                <p id="font">{{ msg }}</p>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="18" :offset="3">
+                <el-button type="primary" v-on:click="getdata()" id="but">
+                    瞅瞅有没有啥忘得
+                </el-button>
+            </el-col>
+        </el-row>
+
         <ul style="list-style-type: none;padding:0; margin:0;">
-            <li v-bind:key="todo" v-for="todo in todolist" id="list">
-                <el-tag closable>
+            <li v-bind:key="todo" v-for="todo in tododata" id="list">
+                <el-tag closable size="medium">
                     {{ todo }}
                 </el-tag>
             </li>
+            <el-button class="button-new-tag" size="small">+ New Tag</el-button>
         </ul>
-        <!-- <el-table :data="todolist" style="width: 100%">
-            <el-table-column  prop="" label="待办事项" width="180"></el-table-column>
+        <!-- <el-table :data="tododata" style="width: 100%" id="table">
+            <el-table-column  prop="todolist" label="待办事项" width="180"></el-table-column>
         </el-table> -->
     </div>
 </template>
@@ -28,7 +38,7 @@ export default {
         return {
             a : 0,
             msg: '来看看备忘录里面有点嘛',
-            todolist : ''
+            tododata : ''
         };
     },
 
@@ -53,7 +63,7 @@ export default {
                 method:'get',
                 url: '/api/getdata'
             }).then(response => {
-                this.todolist = response.data
+                this.tododata = response.data.todolist
             })
         }
     },
@@ -81,5 +91,15 @@ export default {
     font-family: "font_family" !important;
     font-size: 40px;
     font-style: normal;
+}
+#table{
+    size: medium ;
+}
+.button-new-tag {
+    margin-left: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 </style>
