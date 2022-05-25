@@ -29,18 +29,17 @@
                         v-model="inputValue"
                         ref="saveTagInput"
                         clearable
-                        size="medium"
+                        autosize
                         @keyup.enter.native="handleInputConfirm"
                         @blur="handleInputConfirm"
                     >
                     </el-input>
-                    <el-button type="success" class="button-new-tag" size="medium" @click="showInput">添加新备忘录</el-button>
+                    <el-button  type="success" v-else class="button-new-tag" size="medium" @click="showInput">添加新备忘录</el-button>
                 </ul>
             </el-col>
         </el-row>
     </div>
 </template>
-
 
 <script>
 import axios from 'axios'
@@ -168,7 +167,7 @@ export default {
     padding-bottom: 0;
 }
 .input-new-tag {
-    width: 90px;
+    width: 70%;
     margin-left: 10px;
     vertical-align: bottom;
 }
