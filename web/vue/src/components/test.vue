@@ -8,16 +8,18 @@
         <el-row>
             <el-col :span="18" :offset="3">
                 <el-button type="primary" v-on:click="getdata()" id="but">
-                    瞅瞅有没有啥忘得
+                    查询
                 </el-button>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="12" :offset="6">
-                <ul style="list-style-type: none;padding:0; margin:0;">
-                    <li v-bind:key="todo" v-for="todo in tododata" id="list">
+                <ul style="list-style-type: none;padding:0; margin:0;"  >
+                    <li v-bind:key="todo" v-for="(todo,index) in tododata" id="list" @click="test(index)">
                         <!-- <el-tag closable size="medium"> -->
-                            {{ todo }}
+                            <el-link :underline="false">
+                                {{ todo }}
+                            </el-link>
                             <el-divider></el-divider>
                         <!-- </el-tag> -->
                     </li>
@@ -26,12 +28,13 @@
                         v-if="inputVisible"
                         v-model="inputValue"
                         ref="saveTagInput"
-                        size="small"
+                        clearable
+                        size="medium"
                         @keyup.enter.native="handleInputConfirm"
                         @blur="handleInputConfirm"
                     >
                     </el-input>
-                    <el-button class="button-new-tag" size="medium" @click="showInput">+ New Tag</el-button>
+                    <el-button type="success" class="button-new-tag" size="medium" @click="showInput">添加新备忘录</el-button>
                 </ul>
             </el-col>
         </el-row>
@@ -60,6 +63,29 @@ export default {
     },
 
     methods: {
+        test(e){
+            let temp = ""
+            temp = this.tododata[e]
+            console.log(temp)
+            this.$confirm('删除"' + temp + '"该条备忘录', '真的完成了吗', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.deltdata(temp)
+                this.$message({
+                    showClose: true,
+                    type: 'success',
+                    message: '删除成功!'
+                });
+            }).catch(() => {
+                this.$message({
+                    showClose: true,
+                    type: 'info',
+                    message: '看来还是没做完嗷'
+                });
+            });
+        },
         getdata(){
             axios({
                 method:'get',
@@ -74,6 +100,17 @@ export default {
                 url: '/api/adddata',
                 params: {
                     addtodo: input_data}
+            }).then(response=>{
+                this.tododata = response.data.todolist
+            })
+        },
+        deltdata(delt_data){
+            axios({
+                method:'get',
+                url: '/api/deltdata',
+                params: {
+                    delttodo: delt_data
+                }
             }).then(response=>{
                 this.tododata = response.data.todolist
             })
