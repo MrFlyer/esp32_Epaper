@@ -12,18 +12,29 @@
                 </el-button>
             </el-col>
         </el-row>
-
-        <ul style="list-style-type: none;padding:0; margin:0;">
-            <li v-bind:key="todo" v-for="todo in tododata" id="list">
-                <el-tag closable size="medium">
-                    {{ todo }}
-                </el-tag>
-            </li>
-            <el-button class="button-new-tag" size="small">+ New Tag</el-button>
-        </ul>
-        <!-- <el-table :data="tododata" style="width: 100%" id="table">
-            <el-table-column  prop="todolist" label="待办事项" width="180"></el-table-column>
-        </el-table> -->
+        <el-row>
+            <el-col :span="12" :offset="6">
+                <ul style="list-style-type: none;padding:0; margin:0;">
+                    <li v-bind:key="todo" v-for="todo in tododata" id="list">
+                        <!-- <el-tag closable size="medium"> -->
+                            {{ todo }}
+                            <el-divider></el-divider>
+                        <!-- </el-tag> -->
+                    </li>
+                    <el-input
+                        class="input-new-tag"
+                        v-if="inputVisible"
+                        v-model="inputValue"
+                        ref="saveTagInput"
+                        size="small"
+                        @keyup.enter.native="handleInputConfirm"
+                        @blur="handleInputConfirm"
+                    >
+                    </el-input>
+                    <el-button class="button-new-tag" size="medium" @click="showInput">+ New Tag</el-button>
+                </ul>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
@@ -38,7 +49,9 @@ export default {
         return {
             a : 0,
             msg: '来看看备忘录里面有点嘛',
-            tododata : ''
+            tododata : '',
+            inputVisible: false,
+            inputValue: ''
         };
     },
 
@@ -47,24 +60,38 @@ export default {
     },
 
     methods: {
-        changemsg:function(){
-            if (this.a == 0){
-                this.msg = 'nihao'
-                this.a = 1
-                console.log(a)
-            }else  if (this.a == 1) {
-                this.msg = 'hellowwd'
-                this.a = 0
-                console.log(a)
-            }
-        },
-        getdata:function(){
+        getdata(){
             axios({
                 method:'get',
                 url: '/api/getdata'
             }).then(response => {
                 this.tododata = response.data.todolist
             })
+        },
+        adddata(input_data){
+            axios({
+                method:'get',
+                url: '/api/adddata',
+                params: {
+                    addtodo: input_data}
+            }).then(response=>{
+                this.tododata = response.data.todolist
+            })
+        },
+        showInput() {
+            this.inputVisible = true;
+            this.$nextTick(_ => {
+            this.$refs.saveTagInput.$refs.input.focus();
+        });
+        },
+
+        handleInputConfirm() {
+        let inputValue = this.inputValue;
+        if (inputValue) {
+            this.adddata(inputValue);
+        }
+        this.inputVisible = false;
+        this.inputValue = '';
         }
     },
 };
@@ -75,13 +102,14 @@ export default {
     margin-bottom: 10px;
     size: mini;
     /* width: 30px; */
-    text-align: center;
+    /* text-align: center; */
+    font-size: 20px;
 }
 #but{
     margin-top: 10px;
     margin-bottom: 30px;
     size:mini;
-    width: 50%;
+    width: 40%;
     font-size: 150%;
 
 
@@ -89,7 +117,7 @@ export default {
 #font{
     /* font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif; */
     font-family: "font_family" !important;
-    font-size: 40px;
+    font-size: 35px;
     font-style: normal;
 }
 #table{
@@ -97,9 +125,14 @@ export default {
 }
 .button-new-tag {
     margin-left: 10px;
-    height: 32px;
-    line-height: 30px;
+    height: 40px;
+    line-height: 40px;
     padding-top: 0;
     padding-bottom: 0;
+}
+.input-new-tag {
+    width: 90px;
+    margin-left: 10px;
+    vertical-align: bottom;
 }
 </style>
