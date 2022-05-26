@@ -43,7 +43,6 @@
 
 <script>
 import axios from 'axios'
-var a = 0;
 export default {
     name: 'VueTest',
 
@@ -53,7 +52,8 @@ export default {
             msg: '来看看备忘录里面有点嘛',
             tododata : '',
             inputVisible: false,
-            inputValue: ''
+            inputValue: '',
+            show : true
         };
     },
 
