@@ -12,7 +12,7 @@ void PrintWeather(String now_icon, String now_temp, String city, String weather)
     {
         u8g2Fonts.drawGlyph(15, 90, 0x0045);
     }
-    else if (icon_txt == 150) //夜晚晴
+    else if (icon_txt == 1) //夜晚晴
     {
         u8g2Fonts.drawGlyph(15, 90, 0x0042);
     }
@@ -28,7 +28,7 @@ void PrintWeather(String now_icon, String now_temp, String city, String weather)
     {
         u8g2Fonts.drawGlyph(15, 90, 0x0043);
     }
-    else if (icon_txt >= 400 && icon_txt < 1000) //下雪或者其他天气
+    else if (icon_txt >= 21 && icon_txt < 100) //下雪或者其他天气
     {
         u8g2Fonts.drawGlyph(15, 90, 0x0044);
     }

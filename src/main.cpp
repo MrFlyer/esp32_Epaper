@@ -31,6 +31,7 @@
 #include "EngWord.h"
 #include "GetWeather.h"
 #include "GetTime.h"
+StaticJsonDocument<64> todo;
 
 //启动wifi打印链接ip
 void WiFi_Booting()
@@ -147,7 +148,6 @@ void Button(int page)
   }
 }
 
-
 //双击按键事件中断出发函数
 void handler(Button2 &btn)
 {
@@ -219,6 +219,32 @@ void Button_init()
   // MethodChoose.setDoubleClickHandler(UpdateBook);
 }
 
+void GetTodolist()
+{
+  // https.begin("https://devapi.qweather.com/v7/weather/now?location=101030100&key=30625228fb9340a1a538fa03449cb08d");
+  https.begin("https://api.mrflyer.top/getdata");
+  https.setUserAgent("Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36");
+  int httpCode = https.GET();
+  if (httpCode == HTTP_CODE_OK)
+  {
+    String payload = https.getString();
+    const char* todolist;
+    deserializeJson(todo, payload);
+    // JsonObject obj1 = doc.as<JsonObject>();
+    // String code = doc["code"];
+    // String now_icon = doc["now"]["icon"];
+    // delay(500);
+    Serial.println(httpCode);
+    // Serial.println(todo);
+    todolist = todo["todolist"]; // "小程序正常！"
+    Serial.println("赋值成功");
+    Serial.print(todolist);
+    // String a = "150";
+    // PrintWeather(a);
+  }
+  https.end();
+}
+
 //程序总启动
 void setup()
 {
@@ -240,6 +266,7 @@ void setup()
   configTime(8 * 3600, 0, "ntp1.aliyun.com", "ntp2.aliyun.com", "ntp3.aliyun.com");
   GetTime();
   GetWeath();
+  GetTodolist();
   // AnalogData();
 }
 

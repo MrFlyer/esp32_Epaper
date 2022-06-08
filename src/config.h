@@ -7,29 +7,15 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(/*CS=D8
 
 //定义字体
 U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
-
 Button2 MethodChoose, NextWord, LastWord;
-
-HTTPClient https;
-
 StaticJsonDocument<512> doc;
-
-// WiFiUDP ntpUDP; // 创建一个WIFI UDP连接
-
-// NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 8, 30 * 60 * 1000);
-
+HTTPClient https;
 using namespace std;
-
 int i = 0;
-
 int flag = 1;
-
 vector<String> v;
-
 String data;
-
 int temp = 0;
-
 struct WetherData
 {
     char city[32];
