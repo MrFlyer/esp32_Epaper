@@ -221,26 +221,19 @@ void Button_init()
 
 void GetTodolist()
 {
-  // https.begin("https://devapi.qweather.com/v7/weather/now?location=101030100&key=30625228fb9340a1a538fa03449cb08d");
   https.begin("https://api.mrflyer.top/getdata");
   https.setUserAgent("Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36");
   int httpCode = https.GET();
   if (httpCode == HTTP_CODE_OK)
   {
     String payload = https.getString();
-    const char* todolist;
     deserializeJson(todo, payload);
-    // JsonObject obj1 = doc.as<JsonObject>();
-    // String code = doc["code"];
-    // String now_icon = doc["now"]["icon"];
-    // delay(500);
     Serial.println(httpCode);
-    // Serial.println(todo);
-    todolist = todo["todolist"]; // "小程序正常！"
-    Serial.println("赋值成功");
-    Serial.print(todolist);
-    // String a = "150";
-    // PrintWeather(a);
+    Serial.println(payload);
+    const char* todolist_0;
+    todolist_0 = todo["todolist"][0]; // "小程序正常！"
+    String S(todolist_0);
+    Serial.println(S);
   }
   https.end();
 }
