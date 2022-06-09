@@ -220,7 +220,7 @@ void Button_init()
   // MethodChoose.setDoubleClickHandler(UpdateBook);
 }
 
-void GetTodolist()
+void GetTodolist() //能成功获取到api返回来的json但是不能正确的解析
 {
   https.begin("https://api.mrflyer.top/getdata");
   https.setUserAgent("Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36");
